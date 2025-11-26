@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bé Điền Chữ G/Gh</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 1000px;
+            width: 100%;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            border-radius: 15px;
+            color: white;
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .game-content {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .question-section {
+            flex: 6;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 20px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-container {
+            font-size: 8em;
+            margin-bottom: 30px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .word-display {
+            font-size: 3em;
+            color: #333;
+            font-weight: bold;
+            letter-spacing: 5px;
+        }
+
+        .blank {
+            display: inline-block;
+            min-width: 80px;
+            height: 80px;
+            background: white;
+            border: 4px dashed #667eea;
+            border-radius: 15px;
+            color: #ff6b6b;
+            animation: pulse 1s ease-in-out infinite;
+            line-height: 80px;
+            text-align: center;
+            margin: 0 10px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.1);
+            font-size: 0.8em;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                border-color: #667eea;
+                box-shadow: inset 0 4px 8px rgba(0,0,0,0.1), 0 0 0 0 rgba(102, 126, 234, 0.4);
+            }
+            50% { 
+                border-color: #ff6b6b;
+                box-shadow: inset 0 4px 8px rgba(0,0,0,0.1), 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+        }
+
+        .choice-section {
+            flex: 4;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .choice-btn {
+            padding: 40px;
+            font-size: 3em;
+            font-weight: bold;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+            color: white;
+        }
+
+        .choice-btn:first-child {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .choice-btn:last-child {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .choice-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
+        }
+
+        .choice-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .result-screen {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .result-screen h2 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        .result-stats {
+            font-size: 1.5em;
+            margin: 20px 0;
+            line-height: 2;
+        }
+
+        .restart-btn {
+            padding: 20px 50px;
+            font-size: 1.5em;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .feedback {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 5em;
+            font-weight: bold;
+            z-index: 1000;
+            animation: feedback-popup 0.5s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes feedback-popup {
+            0% {
+                transform: translate(-50%, -50%) scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-content {
+                flex-direction: column;
+            }
+            
+            .word-display {
+                font-size: 2em;
+            }
+            
+            .choice-btn {
+                padding: 30px;
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>🌟 Bé Điền Chữ G/Gh 🌟</h1>
+        </div>
+        
+        <div id="gameArea"></div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                emoji: "🪑",
+                word: "Ghế",
+                display: "_ế",
+                answer: "GH",
+                explanation: "GH đứng trước Ê",
+                isPartOne: true,
+                fullWord: "Ghế gỗ"
+            },
+            {
+                emoji: "🪵",
+                word: "Gỗ",
+                display: "_ỗ",
+                answer: "G",
+                explanation: "G đứng trước Ô",
+                isPartTwo: true,
+                fullWord: "Ghế gỗ"
+            },
+            {
+                emoji: "🦀",
+                word: "Ghẹ",
+                display: "_ẹ",
+                answer: "GH",
+                explanation: "GH đứng trước E"
+            },
+            {
+                emoji: "🐻",
+                word: "Gấu",
+                display: "_ấu",
+                answer: "G",
+                explanation: "G đứng trước các nguyên âm khác I, E, Ê"
+            },
+            {
+                emoji: "🐔",
+                word: "Gà",
+                display: "_à",
+                answer: "G",
+                explanation: "G đứng trước A"
+            },
+            {
+                emoji: "🛏️💤",
+                word: "Gối",
+                display: "_ối",
+                answer: "G",
+                explanation: "G đứng trước Ô"
+            },
+            {
+                emoji: "✍️",
+                word: "Ghi bài",
+                display: "_i bài",
+                answer: "GH",
+                explanation: "GH đứng trước I"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let correctAnswers = 0;
+
+        // Audio Context for sounds
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        let backgroundMusicSource = null;
+        let isMusicPlaying = false;
+
+        // Background music - cheerful melody
+        function playBackgroundMusic() {
+            if (isMusicPlaying) return;
+            isMusicPlaying = true;
+            
+            const notes = [
+                // Happy melody pattern
+                {freq: 523.25, duration: 0.3}, // C5
+                {freq: 587.33, duration: 0.3}, // D5
+                {freq: 659.25, duration: 0.3}, // E5
+                {freq: 523.25, duration: 0.3}, // C5
+                {freq: 659.25, duration: 0.3}, // E5
+                {freq: 783.99, duration: 0.6}, // G5
+                {freq: 659.25, duration: 0.3}, // E5
+                {freq: 587.33, duration: 0.3}, // D5
+                {freq: 523.25, duration: 0.6}, // C5
+            ];
+            
+            let currentTime = audioContext.currentTime;
+            
+            function playMelody() {
+                notes.forEach((note, index) => {
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = note.freq;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0.1, currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, currentTime + note.duration);
+                    
+                    oscillator.start(currentTime);
+                    oscillator.stop(currentTime + note.duration);
+                    
+                    currentTime += note.duration;
+                });
+                
+                // Loop the music
+                if (isMusicPlaying) {
+                    setTimeout(playMelody, currentTime * 1000 - audioContext.currentTime * 1000 + 500);
+                }
+            }
+            
+            playMelody();
+        }
+
+        function stopBackgroundMusic() {
+            isMusicPlaying = false;
+        }
+
+        function playSound(frequency, duration, type = 'sine') {
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = frequency;
+            oscillator.type = type;
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration);
+        }
+
+        function playCorrectSound() {
+            stopBackgroundMusic();
+            setTimeout(() => {
+                playSound(523.25, 0.1); // C5
+                setTimeout(() => playSound(659.25, 0.1), 100); // E5
+                setTimeout(() => playSound(783.99, 0.2), 200); // G5
+                setTimeout(() => playBackgroundMusic(), 800);
+            }, 50);
+        }
+
+        function playWrongSound() {
+            stopBackgroundMusic();
+            setTimeout(() => {
+                playSound(300, 0.2, 'square');
+                setTimeout(() => playBackgroundMusic(), 500);
+            }, 50);
+        }
+
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#fd79a8'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        function showFeedback(isCorrect) {
+            const feedback = document.createElement('div');
+            feedback.className = 'feedback';
+            feedback.textContent = isCorrect ? '✨ Tuyệt vời! ✨' : '💭 Oop!';
+            feedback.style.color = isCorrect ? '#4ecdc4' : '#ff6b6b';
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => feedback.remove(), 1000);
+        }
+
+        function handleAnswer(selectedAnswer) {
+            const isCorrect = selectedAnswer === questions[currentQuestion].answer;
+            
+            if (isCorrect) {
+                playCorrectSound();
+                createConfetti();
+                showFeedback(true);
+                score += 10;
+                correctAnswers++;
+            } else {
+                playWrongSound();
+                showFeedback(false);
+            }
+
+            setTimeout(() => {
+                currentQuestion++;
+                if (currentQuestion < questions.length) {
+                    renderGame();
+                } else {
+                    renderResults();
+                }
+            }, 1500);
+        }
+
+        function renderGame() {
+            const gameArea = document.getElementById('gameArea');
+            const q = questions[currentQuestion];
+            
+            let questionTitle = q.word;
+            if (q.isPartOne) {
+                questionTitle = `${q.fullWord} - Phần 1: ${q.word}`;
+            } else if (q.isPartTwo) {
+                questionTitle = `${q.fullWord} - Phần 2: ${q.word}`;
+            }
+            
+            gameArea.innerHTML = `
+                <div class="score-board">
+                    <div>📊 Câu ${currentQuestion + 1}/${questions.length}</div>
+                    <div>⭐ Điểm: ${score}</div>
+                </div>
+                
+                <div class="game-content">
+                    <div class="question-section">
+                        <div class="image-container">${q.emoji}</div>
+                        <div style="font-size: 2em; color: #667eea; margin-bottom: 20px; font-weight: bold;">g hay gh?</div>
+                        <div class="word-display">
+                            <span class="blank">${q.display}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="choice-section">
+                        <button class="choice-btn" onclick="handleAnswer('G')">G</button>
+                        <button class="choice-btn" onclick="handleAnswer('GH')">GH</button>
+                    </div>
+                </div>
+            `;
+            
+            // Start background music if not already playing
+            if (!isMusicPlaying) {
+                playBackgroundMusic();
+            }
+        }
+
+        function renderResults() {
+            stopBackgroundMusic();
+            
+            const gameArea = document.getElementById('gameArea');
+            const percentage = (correctAnswers / questions.length) * 100;
+            const maxScore = questions.length * 10;
+            
+            let message = '';
+            if (percentage === 100) {
+                message = '🎉 Tuyệt vời! Bé đã nắm vững luật chính tả G và GH rồi đấy!';
+            } else if (percentage >= 80) {
+                message = '👏 Rất giỏi! Bé gần hoàn hảo rồi!';
+            } else {
+                message = '💪 Cố gắng lên! Bé hãy xem lại các quy tắc nhé!';
+            }
+            
+            gameArea.innerHTML = `
+                <div class="result-screen">
+                    <h2>🌟 CHÚC MỪNG BÉ ĐÃ HOÀN THÀNH BÀI TẬP! 🌟</h2>
+                    
+                    <div class="result-stats">
+                        <div>🎵 Tổng điểm của bé: <strong style="color: #667eea; font-size: 1.5em;">${score}/${maxScore}</strong> điểm</div>
+                        <div>✅ Số câu trả lời ĐÚNG: <strong style="color: #4ecdc4; font-size: 1.5em;">${correctAnswers}/${questions.length}</strong> câu</div>
+                        <div style="margin-top: 30px; color: #666;">
+                            ${message}
+                        </div>
+                    </div>
+                    
+                    <button class="restart-btn" onclick="restartGame()">🔄 Chơi lại</button>
+                </div>
+            `;
+            
+            if (percentage === 100) {
+                createConfetti();
+            }
+        }
+
+        function restartGame() {
+            currentQuestion = 0;
+            score = 0;
+            correctAnswers = 0;
+            renderGame();
+        }
+
+        // Make functions global
+        window.handleAnswer = handleAnswer;
+        window.restartGame = restartGame;
+
+        // Start game
+        renderGame();
+    </script>
+</body>
+</html>
