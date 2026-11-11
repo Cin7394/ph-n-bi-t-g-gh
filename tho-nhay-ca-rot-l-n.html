@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="theme-color" content="#ffe4ef">
 <title>Thỏ Con Nhảy Cà Rốt – Bé Luyện Nói L/N</title>
-<meta name="description" content="Trò chơi luyện phát âm L và N cho bé: bé đọc to từ, thỏ con nhảy qua củ cà rốt.">
+<meta name="description" content="Trò chơi luyện phát âm L và N cho bé: bé nhìn hình, đọc to, thỏ con nhảy qua củ cà rốt.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Noto+Color+Emoji&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
     color-scheme: light;
@@ -25,6 +25,7 @@
     --shadow: 0 10px 28px rgba(214, 150, 190, .25);
     --font-display: 'Baloo 2', 'Nunito', 'Comic Sans MS', system-ui, sans-serif;
     --font-body: 'Nunito', 'Baloo 2', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-emoji: 'Noto Color Emoji', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Emoji', sans-serif;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
@@ -75,9 +76,10 @@
     filter: grayscale(1) opacity(.3); transition: filter .3s, transform .3s;
   }
   .track span.now { filter: grayscale(.2) opacity(.85); animation: bob 1s ease-in-out infinite; }
+  .track span.later { filter: grayscale(.5) opacity(.55); transform: translateY(2px); }
   .track span.done { filter: none; }
   .track span.gold { filter: drop-shadow(0 0 4px #ffd25e); transform: scale(1.12); }
-  .track span.skip { filter: grayscale(.7) opacity(.5); }
+  .track span.skip { filter: grayscale(.8) opacity(.45); }
   .star-chip {
     font-family: var(--font-display); font-weight: 800; white-space: nowrap;
     background: var(--butter); border-radius: 999px; padding: 2px 12px; font-size: 1.1rem;
@@ -92,7 +94,7 @@
   /* ---------- Sân chơi ---------- */
   .stage {
     position: relative;
-    height: clamp(250px, 48vw, 440px);
+    height: clamp(270px, 50vw, 450px);
     border-radius: 28px;
     border: 4px solid #fff;
     overflow: hidden;
@@ -104,23 +106,36 @@
   .stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
 
   .word-card {
-    position: absolute; top: 10px; left: 50%;
-    transform: translate(-50%, -150%) scale(.8);
+    position: absolute; top: 10px; left: 12px; right: 12px;
+    margin: 0 auto;
+    width: -webkit-fit-content; width: fit-content;
+    max-width: calc(100% - 24px);
+    transform: translateY(-150%) scale(.8);
     opacity: 0;
     display: flex; align-items: center; gap: 12px;
-    max-width: calc(100% - 24px);
-    padding: 6px 22px 6px 12px;
+    padding: 6px 22px 6px 8px;
     background: rgba(255, 255, 255, .95);
     border: 3px solid #ffe0ec;
-    border-radius: 24px;
+    border-radius: 26px;
     box-shadow: 0 6px 0 rgba(240, 170, 200, .35), 0 12px 24px rgba(200, 140, 180, .2);
     transition: transform .45s cubic-bezier(.34, 1.56, .64, 1), opacity .3s, border-color .3s, background .3s;
     pointer-events: none;
   }
-  .word-card.show { transform: translate(-50%, 0) scale(1); opacity: 1; }
+  .word-card.show { transform: none; opacity: 1; }
   .word-card.shake { animation: shake .5s; }
   .word-card.ok { border-color: var(--mint-d); background: rgba(240, 255, 246, .97); }
-  .wc-emoji { font-size: clamp(2.2rem, 7vw, 3.6rem); line-height: 1.1; animation: wiggle 2.4s ease-in-out infinite; }
+  .wc-pic {
+    flex: none;
+    width: clamp(62px, 16vw, 112px); height: clamp(62px, 16vw, 112px);
+    border-radius: 50%;
+    display: grid; place-items: center;
+    background: radial-gradient(circle at 35% 30%, #fff 0%, #fff4f9 55%, #ffe4f0 100%);
+    box-shadow: inset 0 0 0 3px #ffe0ec;
+    font-family: var(--font-emoji);
+    font-size: clamp(2.3rem, 10vw, 4.4rem); line-height: 1;
+  }
+  .wc-pic > span { display: grid; place-items: center; width: 80%; height: 80%; animation: wiggle 2.4s ease-in-out infinite; }
+  .wc-pic svg { width: 100%; height: 100%; display: block; }
   .wc-word {
     font-family: var(--font-display); font-weight: 800; white-space: nowrap;
     font-size: clamp(2rem, 7.4vw, 3.6rem); line-height: 1.2; letter-spacing: .5px;
@@ -128,6 +143,8 @@
   .wc-word .L { color: var(--L); }
   .wc-word .N { color: var(--N); }
   .wc-cap { font-weight: 800; color: var(--ink-soft); font-size: clamp(.8rem, 2.4vw, 1rem); margin-top: -2px; }
+  .word-card.sentence { padding: 8px 22px; text-align: center; }
+  .word-card.sentence .wc-word { white-space: normal; font-size: clamp(1.35rem, 4.8vw, 2.5rem); line-height: 1.25; }
   .wc-check {
     position: absolute; top: -12px; right: -12px;
     width: 34px; height: 34px; border-radius: 50%;
@@ -137,6 +154,12 @@
     transform: scale(0); transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
   }
   .word-card.ok .wc-check { transform: scale(1); }
+  .wc-tag {
+    position: absolute; top: -13px; left: 14px;
+    padding: 0 10px; border-radius: 999px;
+    background: var(--butter); box-shadow: 0 2px 0 var(--butter-d);
+    font-weight: 800; font-size: .8rem; white-space: nowrap;
+  }
 
   .pill {
     position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
@@ -157,7 +180,7 @@
   .pill.paused .bars i { animation: none; }
 
   .toast {
-    position: absolute; left: 50%; top: 50%;
+    position: absolute; left: 50%; top: 52%;
     transform: translate(-50%, -50%) scale(.5);
     opacity: 0;
     padding: 2px 22px;
@@ -176,33 +199,48 @@
   /* ---------- Bảng điều khiển ---------- */
   .panel { margin-top: 14px; background: #fff; border-radius: 28px; padding: 18px; box-shadow: var(--shadow); }
   .panel h2 { font-family: var(--font-display); font-weight: 800; font-size: 1.3rem; margin: 0 0 10px; }
-  .panel h2 + .choices, .panel h2 + .modes { margin-bottom: 16px; }
 
-  .choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-  .choice, .mode {
+  .opt {
     display: flex; flex-direction: column; align-items: center; gap: 2px;
-    padding: 12px 8px;
+    padding: 12px 10px;
     background: var(--cream);
     border: 3px solid transparent; border-radius: 22px;
     box-shadow: 0 5px 0 #f1e2ec;
     cursor: pointer; text-align: center;
     transition: transform .15s, border-color .2s, background .2s, box-shadow .2s;
   }
-  .choice:hover, .mode:hover { transform: translateY(-2px); }
-  .choice[aria-pressed="true"] { border-color: var(--pink-d); background: #fff0f6; box-shadow: 0 5px 0 var(--pink); }
-  .choice .big { font-family: var(--font-display); font-weight: 800; font-size: 2.2rem; line-height: 1.15; }
-  .choice .big .L, .choice .big.L { color: var(--L); }
-  .choice .big .N, .choice .big.N { color: var(--N); }
-  .choice b, .mode b { font-size: 1.05rem; font-weight: 800; }
-  .choice small, .mode small { color: var(--ink-soft); font-weight: 700; font-size: .85rem; line-height: 1.3; }
+  .opt:hover { transform: translateY(-2px); }
+  .opt b { font-size: 1.08rem; font-weight: 800; }
+  .opt small { color: var(--ink-soft); font-weight: 700; font-size: .86rem; line-height: 1.35; }
+  .opt:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+  .levels { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .level > span:last-child { display: flex; flex-direction: column; }
+  .level .lv-pic { font-family: var(--font-emoji); font-size: 2.5rem; line-height: 1.15; flex: none; }
+  .level .lv-pic svg { width: 1.1em; height: 1.1em; display: block; }
+  .level b { font-family: var(--font-display); font-size: 1.2rem; }
+  .level[aria-pressed="true"] { border-color: var(--pink-d); background: #fff0f6; box-shadow: 0 5px 0 var(--pink); }
+
+  .letters { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin: 14px 0 18px; }
+  .letters .lbl { font-weight: 800; margin-right: 2px; }
+  .lt {
+    border: 3px solid transparent; border-radius: 999px;
+    padding: 2px 16px;
+    background: var(--cream); box-shadow: 0 4px 0 #f1e2ec;
+    font-family: var(--font-display); font-weight: 800; font-size: 1.1rem;
+    cursor: pointer;
+  }
+  .lt.L, .lt .L { color: var(--L-ink); }
+  .lt.N, .lt .N { color: var(--N-ink); }
+  .lt[aria-pressed="true"] { border-color: var(--pink-d); background: #fff0f6; }
+  .letters .off-note { color: var(--ink-soft); font-weight: 700; font-size: .92rem; }
 
   .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .mode { flex-direction: row; text-align: left; gap: 12px; padding: 12px 14px; }
   .mode .ico { font-size: 2rem; flex: none; }
   .mode span:last-child { display: flex; flex-direction: column; }
   .mode[aria-pressed="true"] { border-color: var(--blue-d); background: #f0f8ff; box-shadow: 0 5px 0 var(--blue); }
-  .mode:disabled { opacity: .45; cursor: not-allowed; transform: none; }
-  .note { margin: 0; color: var(--ink-soft); font-weight: 700; font-size: .92rem; line-height: 1.45; text-align: center; }
+  .note { margin: 10px 0 0; color: var(--ink-soft); font-weight: 700; font-size: .92rem; line-height: 1.45; text-align: center; }
 
   .btn {
     border: none; border-radius: 999px; cursor: pointer;
@@ -258,7 +296,15 @@
   .end h2 { font-size: clamp(1.5rem, 5vw, 2rem); color: var(--pink-dd); margin: 4px 0; }
   .end p { margin: 4px 0; font-weight: 700; line-height: 1.5; }
   .practice { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 10px 0 4px; }
-  .chip { background: var(--cream); border: 2px solid #f6e2ee; border-radius: 999px; padding: 4px 12px; font-weight: 800; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--cream); border: 2px solid #f6e2ee; border-radius: 999px;
+    padding: 4px 12px; font-weight: 800;
+  }
+  .chip .L { color: var(--L-ink); }
+  .chip .N { color: var(--N-ink); }
+  .chip-pic { font-family: var(--font-emoji); font-size: 1.2em; line-height: 1; }
+  .chip-pic svg { width: 1.2em; height: 1.2em; display: block; }
   .chip small { color: var(--ink-soft); font-weight: 700; }
   .end .row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 14px; }
 
@@ -278,9 +324,12 @@
   footer { margin-top: 16px; text-align: center; color: var(--ink-soft); font-size: .85rem; font-weight: 700; line-height: 1.5; }
 
   @media (max-width: 640px) {
-    .choices { grid-template-columns: repeat(2, 1fr); }
     .tips { grid-template-columns: 1fr; }
     .panel { padding: 14px; }
+  }
+  @media (max-width: 560px) {
+    .levels { grid-template-columns: 1fr; }
+    .level { flex-direction: row; text-align: left; gap: 14px; padding: 10px 14px; }
   }
   @media (max-width: 480px) {
     .modes { grid-template-columns: 1fr; }
@@ -294,11 +343,11 @@
   @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.07); } }
   @keyframes popIn { from { transform: scale(0) rotate(-30deg); opacity: 0; } }
   @keyframes shake {
-    0%, 100% { transform: translate(-50%, 0); }
-    20% { transform: translate(calc(-50% - 10px), 0) rotate(-2deg); }
-    40% { transform: translate(calc(-50% + 10px), 0) rotate(2deg); }
-    60% { transform: translate(calc(-50% - 6px), 0); }
-    80% { transform: translate(calc(-50% + 6px), 0); }
+    0%, 100% { transform: none; }
+    20% { transform: translateX(-10px) rotate(-2deg); }
+    40% { transform: translateX(10px) rotate(2deg); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(6px); }
   }
   @keyframes flash {
     0% { box-shadow: 0 0 0 0 rgba(255, 143, 184, .7); transform: scale(1); }
@@ -306,7 +355,7 @@
     100% { box-shadow: var(--shadow); transform: scale(1); }
   }
   @media (prefers-reduced-motion: reduce) {
-    .wc-emoji, .bubble .who, .track span.now, .btn.pulse { animation: none; }
+    .wc-pic > span, .bubble .who, .track span.now, .btn.pulse { animation: none; }
   }
 </style>
 </head>
@@ -327,12 +376,13 @@
   <div class="stage" id="stage">
     <canvas id="scene" aria-label="Thỏ con chạy trên đồng cỏ và nhảy qua cà rốt" role="img"></canvas>
     <div class="word-card" id="wordCard" aria-live="polite">
-      <div class="wc-emoji" id="wcEmoji"></div>
+      <div class="wc-pic" id="wcPic" aria-hidden="true"></div>
       <div>
         <div class="wc-word" id="wcWord"></div>
         <div class="wc-cap" id="wcCap"></div>
       </div>
       <div class="wc-check" aria-hidden="true">✓</div>
+      <div class="wc-tag" id="wcTag" hidden>🔁 Thử lại nè</div>
     </div>
     <div class="toast" id="toast" aria-live="assertive"></div>
     <div class="pill" id="pill" hidden>
@@ -343,29 +393,37 @@
 
   <!-- Màn hình chọn bài -->
   <section class="panel" id="panelStart">
-    <h2>1. Chọn bài cho bé</h2>
-    <div class="choices" id="setChoices">
-      <button class="choice" type="button" data-set="L" aria-pressed="false">
-        <span class="big L">L</span><b>Chữ L</b><small>lá, lê, lợn…</small>
+    <h2>1. Chọn cấp độ</h2>
+    <div class="levels" id="levelChoices">
+      <button class="opt level" type="button" data-level="1" aria-pressed="true">
+        <span class="lv-pic" id="lvPic1"></span>
+        <span><b>Cấp 1 · Dễ</b><small>1 tiếng, có hình: lá, lê, na…<br>cho bé mới học nói</small></span>
       </button>
-      <button class="choice" type="button" data-set="N" aria-pressed="false">
-        <span class="big N">N</span><b>Chữ N</b><small>nấm, nai, nơ…</small>
+      <button class="opt level" type="button" data-level="2" aria-pressed="false">
+        <span class="lv-pic">🐪</span>
+        <span><b>Cấp 2 · Vừa</b><small>2 tiếng, có hình: lạc đà, núi lửa…</small></span>
       </button>
-      <button class="choice" type="button" data-set="MIX" aria-pressed="true">
-        <span class="big"><span class="L">L</span>·<span class="N">N</span></span><b>Trộn L – N</b><small>phân biệt hai chữ</small>
+      <button class="opt level" type="button" data-level="3" aria-pressed="false">
+        <span class="lv-pic">📜</span>
+        <span><b>Cấp 3 · Khó</b><small>Câu dài cho bé đọc giỏi: «Lúa nếp là lúa nếp làng»…</small></span>
       </button>
-      <button class="choice" type="button" data-set="LN" aria-pressed="false">
-        <span class="big">🌋</span><b>Thử thách</b><small>núi lửa, leo núi…</small>
-      </button>
+    </div>
+
+    <div class="letters" id="letterRow">
+      <span class="lbl">Luyện chữ:</span>
+      <button class="lt L" type="button" data-letter="L" aria-pressed="false">L</button>
+      <button class="lt N" type="button" data-letter="N" aria-pressed="false">N</button>
+      <button class="lt" type="button" data-letter="MIX" aria-pressed="true">Cả <span class="L">L</span> và <span class="N">N</span></button>
+      <span class="off-note" id="letterNote" hidden>Cấp 3: mỗi câu đều có cả L và N.</span>
     </div>
 
     <h2>2. Ai chấm cho bé?</h2>
     <div class="modes" id="modeChoices">
-      <button class="mode" type="button" data-mode="mic" aria-pressed="true">
+      <button class="opt mode" type="button" data-mode="mic" aria-pressed="true">
         <span class="ico">🎤</span>
         <span><b>Thỏ nghe bé nói</b><small>Dùng micro, máy tự nhận giọng bé</small></span>
       </button>
-      <button class="mode" type="button" data-mode="manual" aria-pressed="false">
+      <button class="opt mode" type="button" data-mode="manual" aria-pressed="false">
         <span class="ico">👩‍🏫</span>
         <span><b>Bố mẹ / cô chấm</b><small>Nghe bé đọc rồi bấm ✓ Đúng</small></span>
       </button>
@@ -384,9 +442,9 @@
       <button class="btn blue" id="btnHear" type="button">🔊 Nghe mẫu</button>
       <button class="btn mint" id="btnRight" type="button">✓ Bé nói đúng</button>
       <button class="btn pink" id="btnWrong" type="button">↺ Chưa đúng</button>
-      <button class="btn ghost" id="btnSkip" type="button">⏭ Bỏ qua</button>
+      <button class="btn ghost" id="btnLater" type="button">🕒 Để lát nữa</button>
     </div>
-    <p class="kbd-hint" id="kbdHint">Bàn phím: <b>Phím cách</b> = Đúng · <b>X</b> = Chưa đúng</p>
+    <p class="kbd-hint" id="kbdHint"></p>
   </section>
 
   <!-- Kết thúc -->
@@ -414,14 +472,15 @@
       <div class="tip-letter">N</div>
       <div>
         <b>Chữ <span class="N">N</span> – hơi đi ra mũi 👃</b>
-        <p>Đặt ngón tay lên mũi: nói N thì mũi rung rung, nói L thì không. Đọc: <i>nờ – nai – nấm</i>.</p>
+        <p>Đặt ngón tay lên mũi: nói N thì mũi rung rung, nói L thì không. Đọc: <i>nờ – na – nai</i>.</p>
       </div>
     </div>
   </section>
 
   <footer>
-    Để Thỏ nghe được giọng bé, hãy mở bằng <b>Chrome</b> (máy tính, Android) hoặc <b>Safari</b> (iPhone, iPad), có mạng Internet và cho phép dùng micro.<br>
-    Không có micro? Chọn <b>Bố mẹ / cô chấm</b> là chơi được ngay.
+    Thỏ luôn dừng lại chờ bé, không bao giờ phải chơi lại từ đầu. Bé chưa đọc được thì bấm <b>🕒 Để lát nữa</b>.<br>
+    Để Thỏ nghe được giọng bé, hãy mở bằng <b>Chrome</b> (máy tính, Android) hoặc <b>Safari</b> (iPhone, iPad), có mạng Internet và cho phép dùng micro.
+    Không có micro? Chọn <b>Bố mẹ / cô chấm</b>.
   </footer>
 </div>
 
@@ -429,56 +488,105 @@
 (() => {
   'use strict';
 
+  /* ---------- Hình tự vẽ cho những thứ không có sẵn biểu tượng ---------- */
+  function svgNa() {   // quả na
+    let bumps = '';
+    for (let row = 0; row < 6; row++) {
+      const y = 33 + row * 10;
+      for (let x = 18 + (row % 2) * 6; x <= 84; x += 12) {
+        if ((x - 50) ** 2 + (y - 58) ** 2 < 29 ** 2) bumps += `M${x - 6} ${y}q6 8 12 0`;
+      }
+    }
+    return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+      '<path d="M50 24C50 16 53 11 58 8" stroke="#9a7452" stroke-width="5" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="66" cy="15" rx="12" ry="5.5" transform="rotate(-25 66 15)" fill="#8fd6a0" stroke="#5fb67a" stroke-width="2.5"/>' +
+      '<circle cx="50" cy="58" r="36" fill="#b3e09f" stroke="#6fb36f" stroke-width="3"/>' +
+      `<path d="${bumps}" fill="none" stroke="#7cbf74" stroke-width="2.6" stroke-linecap="round"/>` +
+      '<ellipse cx="37" cy="44" rx="8" ry="5" fill="#fff" opacity=".5"/></svg>';
+  }
+  function svgNon() {   // nón lá
+    return '<svg viewBox="0 0 100 100" aria-hidden="true">' +
+      '<path d="M50 16L90 64Q50 78 10 64Z" fill="#f7e3a6" stroke="#d6b35c" stroke-width="3" stroke-linejoin="round"/>' +
+      '<path d="M50 16L28 69M50 16L42 72M50 16L58 72M50 16L72 69" stroke="#e6c97f" stroke-width="2" fill="none"/>' +
+      '<path d="M33 37Q50 41 67 37M20 52Q50 58 80 52" stroke="#d9b866" stroke-width="2.4" fill="none"/>' +
+      '<path d="M22 67Q50 96 78 67" stroke="#ff9cc2" stroke-width="3.5" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="44" cy="34" rx="4" ry="9" transform="rotate(35 44 34)" fill="#fff" opacity=".45"/></svg>';
+  }
+  const PICS = { na: svgNa(), non: svgNon() };
+
   /* =========================================================
      KHO TỪ — thầy cô / bố mẹ có thể sửa, thêm từ ở đây.
-     w: từ bé cần đọc · e: hình emoji · c: chú thích nhỏ
+     w: từ bé cần đọc · e: hình (emoji, hoặc 'svg:na' / 'svg:non')
+     c: chú thích nhỏ dưới từ
      ========================================================= */
-  const BANK = {
-    L: [
-      { w: 'lá',       e: '🍃', c: 'chiếc lá' },
-      { w: 'lê',       e: '🍐', c: 'quả lê' },
-      { w: 'lợn',      e: '🐷', c: 'con lợn' },
-      { w: 'lửa',      e: '🔥', c: 'ngọn lửa' },
-      { w: 'lúa',      e: '🌾', c: 'cây lúa' },
-      { w: 'lều',      e: '⛺', c: 'cái lều' },
-      { w: 'lạc đà',   e: '🐪', c: 'con lạc đà' },
-      { w: 'lâu đài',  e: '🏰', c: 'tòa lâu đài' },
-      { w: 'đèn lồng', e: '🏮', c: 'chiếc đèn lồng' },
-      { w: 'lưỡi',     e: '👅', c: 'cái lưỡi' },
-      { w: 'lông vũ',  e: '🪶', c: 'chiếc lông vũ' },
-      { w: 'củ lạc',   e: '🥜', c: 'củ lạc' },
-      { w: 'cái loa',  e: '📢', c: 'cái loa' },
-      { w: 'lá thư',   e: '💌', c: 'lá thư' },
-    ],
-    N: [
-      { w: 'nấm',      e: '🍄', c: 'cây nấm' },
-      { w: 'nước',     e: '💧', c: 'giọt nước' },
-      { w: 'nai',      e: '🦌', c: 'con nai' },
-      { w: 'nến',      e: '🕯️', c: 'cây nến' },
-      { w: 'núi',      e: '⛰️', c: 'ngọn núi' },
-      { w: 'nồi',      e: '🍲', c: 'cái nồi' },
-      { w: 'nơ',       e: '🎀', c: 'cái nơ' },
-      { w: 'nắng',     e: '☀️', c: 'trời nắng' },
-      { w: 'nón',      e: '👒', c: 'cái nón' },
-      { w: 'nĩa',      e: '🍴', c: 'cái nĩa' },
-      { w: 'nóng',     e: '🥵', c: 'trời nóng' },
-      { w: 'nụ cười',  e: '😊', c: 'nụ cười' },
-      { w: 'nàng tiên cá', e: '🧜‍♀️', c: 'nàng tiên cá' },
-    ],
-    LN: [
+  const LEVELS = {
+    1: { round: 10, unit: 'từ', items: [
+      { w: 'lá',   e: '🍃', c: 'chiếc lá' },
+      { w: 'lê',   e: '🍐', c: 'quả lê' },
+      { w: 'lợn',  e: '🐷', c: 'con lợn' },
+      { w: 'lửa',  e: '🔥', c: 'ngọn lửa' },
+      { w: 'lúa',  e: '🌾', c: 'cây lúa' },
+      { w: 'lều',  e: '⛺', c: 'cái lều' },
+      { w: 'lưỡi', e: '👅', c: 'cái lưỡi' },
+      { w: 'lạc',  e: '🥜', c: 'củ lạc' },
+      { w: 'loa',  e: '📢', c: 'cái loa' },
+      { w: 'lon',  e: '🥫', c: 'cái lon' },
+      { w: 'len',  e: '🧶', c: 'cuộn len' },
+      { w: 'leo',  e: '🧗', c: 'bé leo trèo' },
+      { w: 'na',   e: 'svg:na', c: 'quả na' },
+      { w: 'nai',  e: '🦌', c: 'con nai' },
+      { w: 'nấm',  e: '🍄', c: 'cây nấm' },
+      { w: 'nến',  e: '🕯️', c: 'cây nến' },
+      { w: 'núi',  e: '⛰️', c: 'ngọn núi' },
+      { w: 'nồi',  e: '🍲', c: 'cái nồi' },
+      { w: 'nơ',   e: '🎀', c: 'cái nơ' },
+      { w: 'nón',  e: 'svg:non', c: 'cái nón lá' },
+      { w: 'nắng', e: '☀️', c: 'trời nắng' },
+      { w: 'nước', e: '💧', c: 'giọt nước' },
+      { w: 'năm',  e: '🖐️', c: 'năm ngón tay' },
+      { w: 'nằm',  e: '🛌', c: 'nằm ngủ' },
+    ] },
+    2: { round: 10, unit: 'từ', items: [
+      { w: 'lạc đà',    e: '🐪', c: 'con lạc đà' },
+      { w: 'lâu đài',   e: '🏰', c: 'tòa lâu đài' },
+      { w: 'đèn lồng',  e: '🏮', c: 'chiếc đèn lồng' },
+      { w: 'lông vũ',   e: '🪶', c: 'chiếc lông vũ' },
+      { w: 'lá thư',    e: '💌', c: 'lá thư' },
+      { w: 'lốc xoáy',  e: '🌪️', c: 'cơn lốc xoáy' },
+      { w: 'bông lúa',  e: '🌾', c: 'bông lúa chín' },
+      { w: 'lá cờ',     e: '🚩', c: 'lá cờ' },
+      { w: 'lái xe',    e: '🚗', c: 'bố lái xe' },
+      { w: 'con nai',   e: '🦌', c: 'con nai' },
+      { w: 'cây nến',   e: '🕯️', c: 'cây nến' },
+      { w: 'cây nấm',   e: '🍄', c: 'cây nấm' },
+      { w: 'cái nơ',    e: '🎀', c: 'cái nơ' },
+      { w: 'nàng tiên', e: '🧚', c: 'nàng tiên' },
+      { w: 'nụ cười',   e: '😊', c: 'nụ cười' },
+      { w: 'nước mắt',  e: '😢', c: 'nước mắt' },
+      { w: 'quả na',    e: 'svg:na', c: 'quả na' },
       { w: 'núi lửa',   e: '🌋', c: 'ngọn núi lửa' },
       { w: 'leo núi',   e: '🧗', c: 'bạn nhỏ leo núi' },
+      { w: 'nón lá',    e: 'svg:non', c: 'chiếc nón lá' },
       { w: 'lá non',    e: '🌱', c: 'mầm lá non' },
       { w: 'lon nước',  e: '🥫', c: 'lon nước' },
-      { w: 'nắng lên',  e: '🌅', c: 'mặt trời lên' },
-      { w: 'nước lạnh', e: '🧊', c: 'nước lạnh' },
       { w: 'nồi lẩu',   e: '🍲', c: 'nồi lẩu' },
-      { w: 'lúa non',   e: '🌾', c: 'cánh đồng lúa non' },
-      { w: 'nặng lắm',  e: '🏋️', c: 'nặng lắm' },
-      { w: 'long lanh', e: '✨', c: 'sáng long lanh' },
-    ],
+      { w: 'nước lạnh', e: '🧊', c: 'cốc nước lạnh' },
+      { w: 'nắng lên',  e: '🌅', c: 'mặt trời lên' },
+    ] },
+    3: { round: 6, unit: 'câu', items: [   // câu dài, không cần hình
+      { w: 'Lúa nếp là lúa nếp làng' },
+      { w: 'Lúa lên lớp lớp lòng nàng lâng lâng' },
+      { w: 'Nồi đồng nấu ốc, nồi đất nấu ếch' },
+      { w: 'Năm nay nắng nóng lắm' },
+      { w: 'Nàng Lan nấu nồi lẩu' },
+      { w: 'Lá lành đùm lá rách' },
+      { w: 'Lên non mới biết non cao' },
+      { w: 'Nói lời phải giữ lấy lời' },
+      { w: 'Nu na nu nống' },
+      { w: 'Lan leo lên núi' },
+      { w: 'Long lanh đáy nước in trời' },
+    ] },
   };
-  const ROUND = 10;   // số củ cà rốt mỗi lượt
 
   const PRAISE = ['Giỏi quá! 🎉', 'Tuyệt vời! 🌟', 'Đúng rồi! 🥕', 'Hay lắm! 💖', 'Xuất sắc! ✨'];
   const TIP = {
@@ -498,17 +606,26 @@
     const low = s.toLowerCase();
     return isLN(low) ? `<span class="${low[0] === 'l' ? 'L' : 'N'}">${s[0]}</span>${s.slice(1)}` : s;
   }).join(' ');
+  const picHTML = it => !it.e ? '' : it.e.startsWith('svg:') ? PICS[it.e.slice(4)] : esc(it.e);
 
-  // So sánh câu máy nghe được với từ cần đọc (bỏ qua dấu thanh, chỉ xét đúng L / N)
+  // So sánh câu máy nghe được với từ cần đọc (bỏ qua dấu thanh, chỉ xét đúng L / N).
+  // Câu dài (cấp 3) chỉ cần đúng khoảng 3/4 số tiếng có L/N và không nhầm L↔N.
   function judge(alts, item) {
     const lists = alts.map(tokens).filter(t => t.length);
     if (!lists.length) return null;
-    const keys = item.keys;
-    const top = lists[0];
-    if (keys.every(k => top.includes(k))) return { ok: true };
-    const swapped = keys.filter(k => !top.includes(k) && top.includes(swapLN(k)));
-    if (swapped.length) return { ok: false, swapped, heard: alts[0] };
-    for (const t of lists.slice(1)) if (keys.every(k => t.includes(k))) return { ok: true };
+    const keys = [...new Set(item.keys)];
+    const need = item.long ? Math.ceil(keys.length * 0.75) : keys.length;
+    const check = toks => ({
+      hit: keys.filter(k => toks.includes(k)).length,
+      swapped: keys.filter(k => !toks.includes(k) && toks.includes(swapLN(k))),
+    });
+    const top = check(lists[0]);
+    if (!top.swapped.length && top.hit >= need) return { ok: true };
+    if (top.swapped.length) return { ok: false, swapped: top.swapped, heard: alts[0] };
+    for (const t of lists.slice(1)) {
+      const r = check(t);
+      if (!r.swapped.length && r.hit >= need) return { ok: true };
+    }
     return { ok: false, swapped: [], heard: alts[0] };
   }
 
@@ -516,19 +633,21 @@
   const pick = arr => arr[Math.floor(Math.random() * arr.length)];
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
   const hash = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  const TAU = Math.PI * 2;
 
   /* ---------- DOM ---------- */
   const $ = id => document.getElementById(id);
   const stage = $('stage'), canvas = $('scene'), ctx = canvas.getContext('2d');
   const ui = {
     hud: $('hud'), track: $('track'), starCount: $('starCount'),
-    card: $('wordCard'), wcEmoji: $('wcEmoji'), wcWord: $('wcWord'), wcCap: $('wcCap'),
+    card: $('wordCard'), wcPic: $('wcPic'), wcWord: $('wcWord'), wcCap: $('wcCap'), wcTag: $('wcTag'),
     toast: $('toast'), pill: $('pill'), pillText: $('pillText'),
     panelStart: $('panelStart'), panelPlay: $('panelPlay'), panelEnd: $('panelEnd'),
     bubble: $('bubbleText'), modeNote: $('modeNote'),
-    btnHear: $('btnHear'), btnRight: $('btnRight'), btnWrong: $('btnWrong'), btnSkip: $('btnSkip'),
+    btnHear: $('btnHear'), btnRight: $('btnRight'), btnWrong: $('btnWrong'), btnLater: $('btnLater'),
     btnMute: $('btnMute'), kbdHint: $('kbdHint'),
   };
+  $('lvPic1').innerHTML = PICS.na;
 
   /* ---------- Âm thanh (Web Audio, không cần file) ---------- */
   let actx = null, muted = false;
@@ -556,6 +675,7 @@
     ok: () => [784, 988, 1319].forEach((f, i) => tone(f, 0.2, { type: 'triangle', vol: 0.13, when: i * 0.08 })),
     wrong: () => { tone(392, 0.16, { vol: 0.11 }); tone(330, 0.24, { vol: 0.11, when: 0.14 }); },
     pop: () => tone(660, 0.09, { slide: 990, vol: 0.08 }),
+    dig: () => tone(300, 0.35, { type: 'triangle', slide: 110, vol: 0.1 }),
     win: () => [523, 659, 784, 1047, 784, 1047].forEach((f, i) => tone(f, 0.22, { type: 'triangle', vol: 0.13, when: i * 0.12 })),
   };
 
@@ -574,7 +694,7 @@
       u.voice = this.voice; u.lang = this.voice.lang; u.rate = 0.8; u.pitch = 1.1;
       let fin = false;
       const end = () => { if (!fin) { fin = true; done && done(); } };
-      u.onend = end; u.onerror = end; setTimeout(end, 4000);
+      u.onend = end; u.onerror = end; setTimeout(end, 6000);
       speechSynthesis.speak(u);
     },
   };
@@ -633,17 +753,19 @@
   const DJ = 1.15;  // khoảng cách (theo kích thước thỏ) để bật nhảy
   const JT = 0.8;   // thời gian một cú nhảy (giây)
   const JH = 1.35;  // độ cao cú nhảy (theo kích thước thỏ)
+  const HIDE_T = 0.75; // thời gian cà rốt chui xuống đất (giây)
   const G = {
     phase: 'menu',          // menu | play | finish
     motion: 'run',          // run | wait | jump
-    set: 'MIX', mode: SR ? 'mic' : 'manual',
-    items: [], results: [], idx: 0, stars: 0, round: 0,
+    level: 1, letter: 'MIX', mode: SR ? 'mic' : 'manual',
+    items: [], results: [], queue: [], cur: -1, stars: 0, round: 0,
     carrot: null, old: [], jumpT: 0, jumpAt: 0, nextDemo: 0, wrongLock: 0,
     speed: 0, vRun: 2.2, worldX: 0,
   };
   const B = { runPhase: 0, squash: 0, shake: 0, happy: 0, ear: 0, blinkAt: 2, blink: 0 };
   let T = 0, W = 0, H = 0, S = 60, groundY = 0, bunnyX = 0, DPR = 1;
   let clouds = [], particles = [];
+  let heardBuf = '', wrongTimer = 0;   // gom các đoạn bé đọc (câu dài)
 
   /* ---------- Giao diện ---------- */
   let toastTimer = 0;
@@ -660,10 +782,14 @@
     ui.pill.className = 'pill ' + (state === 'hear' ? 'hearing' : state === 'paused' ? 'paused' : '');
     ui.pillText.textContent = text || (state === 'paused' ? '🔊 Thỏ đang đọc mẫu…' : '🎤 Thỏ đang nghe bé nói…');
   }
-  function showCard(it) {
-    ui.wcEmoji.textContent = it.e;
+  function showCard(it, retry) {
+    const long = !!it.long;
+    ui.card.classList.toggle('sentence', long);
+    ui.wcPic.hidden = long;
+    ui.wcPic.innerHTML = long ? '' : `<span>${picHTML(it)}</span>`;
     ui.wcWord.innerHTML = wordHTML(it.w);
-    ui.wcCap.textContent = it.c || '';
+    ui.wcCap.textContent = long ? 'Bé đọc to cả câu nhé 📖' : (it.c || '');
+    ui.wcTag.hidden = !retry;
     ui.card.classList.remove('ok', 'shake', 'show');
     void ui.card.offsetWidth;
     ui.card.classList.add('show');
@@ -679,9 +805,15 @@
     updateTrack();
   }
   function updateTrack() {
+    const active = G.phase === 'play' && G.carrot && G.carrot.item;
     [...ui.track.children].forEach((el, i) => {
       const r = G.results[i];
-      el.className = i < G.idx ? (r.skipped ? 'skip' : r.first ? 'done gold' : 'done') : i === G.idx && G.phase === 'play' ? 'now' : '';
+      let cls = '';
+      if (r.state === 'done') cls = r.attempts === 0 && r.later === 0 ? 'done gold' : 'done';
+      else if (r.state === 'skip') cls = 'skip';
+      else if (active && i === G.cur) cls = 'now';
+      else if (r.state === 'later') cls = 'later';
+      el.className = cls;
     });
     ui.starCount.textContent = G.stars;
   }
@@ -700,19 +832,40 @@
       ? 'Bàn phím: <b>Phím cách</b> = bố mẹ chấm đúng'
       : 'Bàn phím: <b>Phím cách</b> = Đúng · <b>X</b> = Chưa đúng';
   }
+  const sayHTML = it => `«<b>${wordHTML(it.w)}</b>»`;
 
   /* ---------- Luồng chơi ---------- */
+  function pickItems() {
+    const lv = LEVELS[G.level];
+    const all = lv.items.map(it => {
+      const keys = keysOf(it.w);
+      return Object.assign({}, it, {
+        keys, long: G.level === 3,
+        hasL: keys.some(k => k[0] === 'l'), hasN: keys.some(k => k[0] === 'n'),
+      });
+    });
+    const n = lv.round;
+    if (G.level === 3) return shuffle(all).slice(0, n);
+    if (G.letter === 'L') return shuffle(all.filter(i => i.hasL)).slice(0, n);
+    if (G.letter === 'N') return shuffle(all.filter(i => i.hasN)).slice(0, n);
+    // Cả L và N: chia đều hai chữ
+    const both = shuffle(all.filter(i => i.hasL && i.hasN));
+    const onlyL = shuffle(all.filter(i => i.hasL && !i.hasN));
+    const onlyN = shuffle(all.filter(i => i.hasN && !i.hasL));
+    const nb = Math.min(both.length, Math.floor(n / 3));
+    const rest = n - nb;
+    return shuffle(both.slice(0, nb).concat(onlyL.slice(0, Math.ceil(rest / 2)), onlyN.slice(0, Math.floor(rest / 2))));
+  }
+
   function newRound() {
-    let pool;
-    if (G.set === 'MIX') {
-      const half = Math.floor(ROUND / 2);
-      pool = shuffle(shuffle(BANK.L).slice(0, half).concat(shuffle(BANK.N).slice(0, ROUND - half)));
-    } else pool = shuffle(BANK[G.set]).slice(0, ROUND);
-    G.items = pool.map(it => Object.assign({}, it, { keys: keysOf(it.w) }));
-    G.results = G.items.map(() => ({ attempts: 0, heard: [], first: false, skipped: false }));
-    G.idx = 0; G.stars = 0; G.round++;
+    G.items = pickItems();
+    G.results = G.items.map(() => ({ attempts: 0, heard: [], later: 0, state: 'pending' }));
+    G.queue = G.items.map((_, i) => i);
+    G.cur = -1; G.stars = 0; G.round++;
     buildTrack();
   }
+
+  function resetHeard() { heardBuf = ''; clearTimeout(wrongTimer); }
 
   // Cà rốt còn ở phía trước thỏ thì "biến mất" lấp lánh, để thỏ không chạy xuyên qua
   function clearAhead() {
@@ -727,18 +880,20 @@
     audio();
     if (document.activeElement) document.activeElement.blur();
     clearAhead();
+    resetHeard();
     newRound();
     G.phase = 'play';
     showPanel('play');
     updatePlayControls();
     updateTrack();
-    bubble('Cà rốt sắp tới rồi! Bé nhìn bảng và <b>đọc thật to</b> để Thỏ nhảy qua nhé! 🥕');
+    bubble('Cà rốt sắp tới rồi! Bé nhìn bảng và <b>nói thật to</b> để Thỏ nhảy qua nhé! 🥕');
     if (G.mode === 'mic') { Mic.blocked = false; Mic.start(); setPill('listen'); }
   }
 
   function goMenu() {
     Mic.stop();
     if (TTS.ok) speechSynthesis.cancel();
+    resetHeard();
     G.phase = 'menu';
     clearAhead();
     G.nextDemo = T + 1;
@@ -747,37 +902,62 @@
   }
 
   function spawnCarrot() {
-    const it = G.items[G.idx];
+    G.cur = G.queue.shift();
+    const it = G.items[G.cur], r = G.results[G.cur];
+    const retry = r.later > 0;
     G.carrot = { d: (W - bunnyX) / S + 0.7, item: it, passed: false, round: G.round };
-    showCard(it);
+    resetHeard();
+    showCard(it, retry);
     updateTrack();
-    ui.btnSkip.classList.remove('pulse');
+    ui.btnLater.classList.remove('pulse');
     ui.btnRight.classList.remove('pulse');
-    const say = `«<b>${wordHTML(it.w)}</b>»`;
-    bubble(G.mode === 'mic'
-      ? `Cà rốt tới rồi! Bé đọc to ${say} để Thỏ nhảy qua nhé!`
-      : `Bé đọc to ${say}. Bố mẹ nghe bé nói đúng thì bấm <b>✓</b> nhé!`);
+    let msg;
+    if (retry) msg = `Củ cà rốt ${sayHTML(it)} quay lại rồi! Mình thử lại nhé 💪`;
+    else if (G.mode === 'manual') msg = `Bé đọc ${sayHTML(it)}. Bố mẹ nghe bé nói đúng thì bấm <b>✓</b> nhé!`;
+    else if (it.long) msg = `Bé đọc to cả câu ${sayHTML(it)} để Thỏ nhảy qua nhé!`;
+    else msg = `Bé nhìn hình và nói to ${sayHTML(it)} để Thỏ nhảy qua nhé!`;
+    bubble(msg);
     SFX.pop();
   }
 
   function onWait() {
     const it = G.carrot.item;
-    bubble(G.mode === 'mic'
-      ? `Thỏ đang chờ bé nè! Đọc to «<b>${wordHTML(it.w)}</b>» nào! 🐰`
-      : `Thỏ đang chờ! Bé đọc «<b>${wordHTML(it.w)}</b>», bố mẹ bấm <b>✓</b> khi bé nói đúng nhé.`);
+    bubble(`Thỏ dừng lại chờ bé nè, không vội đâu! 🐰 Bé nói ${sayHTML(it)} nhé.` +
+      '<br>Chưa đọc được thì bấm <b>🕒 Để lát nữa</b>, lát nữa củ này sẽ quay lại.');
     if (G.mode === 'manual') ui.btnRight.classList.add('pulse');
   }
 
   function canAnswer() {
     const c = G.carrot;
-    return G.phase === 'play' && c && c.item && !c.passed && G.motion !== 'jump';
+    return G.phase === 'play' && c && c.item && !c.passed && !c.hiding && G.motion !== 'jump';
   }
 
   function onHeard(alts, isFinal) {
     if (!canAnswer()) return;
+    const item = G.carrot.item;
+    if (item.long) {
+      // Câu dài: bé có thể đọc chậm, ngắt nghỉ — gom các đoạn lại rồi mới chấm
+      const all = alts.map(a => (heardBuf + ' ' + a).trim());
+      setPill('hear', `🎤 «${all[0]}»`);
+      if (T < G.wrongLock) return;
+      const v = judge(all, item);
+      if (!v) return;
+      if (v.ok) { correct(); return; }
+      clearTimeout(wrongTimer);
+      if (isFinal) {
+        heardBuf = all[0];
+        wrongTimer = setTimeout(() => {
+          if (!canAnswer() || !heardBuf) return;
+          const vv = judge([heardBuf], item);
+          heardBuf = '';
+          if (vv && !vv.ok) wrong(vv);
+        }, 2600);
+      }
+      return;
+    }
     if (alts[0]) setPill('hear', `🎤 «${alts[0]}»`);
     if (T < G.wrongLock) return;
-    const v = judge(alts, G.carrot.item);
+    const v = judge(alts, item);
     if (!v) return;
     if (v.ok) correct();
     else if (isFinal) wrong(v);
@@ -785,10 +965,11 @@
 
   function correct() {
     if (!canAnswer()) return;
-    const c = G.carrot, r = G.results[G.idx];
+    const c = G.carrot, r = G.results[G.cur];
     c.passed = true;
-    r.first = r.attempts === 0;
+    r.state = 'done';
     G.stars++;
+    resetHeard();
     updateTrack();
     SFX.ok();
     toast(pick(PRAISE));
@@ -796,39 +977,62 @@
     ui.btnRight.classList.remove('pulse');
     B.happy = 1.4;
     burst(bunnyX + S * 0.2, groundY - S * 0.9, 16);
-    bubble(`🎉 Bé đọc đúng «<b>${wordHTML(c.item.w)}</b>» rồi! Thỏ nhảy nè!`);
+    bubble(`🎉 Bé ${c.item.long ? 'đọc' : 'nói'} đúng ${sayHTML(c.item)} rồi! Thỏ nhảy nè!`);
     G.jumpAt = T + 0.45;
   }
 
   function wrong(info) {
     if (!canAnswer() || T < G.wrongLock) return;
     G.wrongLock = T + 1.0;
-    const c = G.carrot, r = G.results[G.idx];
+    const it = G.carrot.item, r = G.results[G.cur];
     r.attempts++;
     if (info && info.heard) r.heard.push(info.heard);
     SFX.wrong();
     B.shake = 0.7;
     cardShake();
     toast('Thử lại nhé! 💪', 'warn');
-    const letter = info && info.swapped && info.swapped.length ? info.swapped[0][0] : (c.item.keys[0] || 'l')[0];
-    let msg;
-    if (info && info.heard && info.swapped.length) msg = `Thỏ nghe thành «<b>${esc(info.heard)}</b>» mất rồi 🙉<br>${TIP[letter]}`;
-    else if (info && info.heard) msg = `Thỏ nghe là «<b>${esc(info.heard)}</b>». Bé đọc to và rõ hơn chút nữa nhé! 💪`;
-    else msg = `Mình thử lại nhé! ${TIP[letter]}`;
-    if (r.attempts >= 2 && !ui.btnHear.hidden) msg += '<br>Bấm <b>🔊 Nghe mẫu</b> để nghe cách đọc nhé.';
+    let letter = (it.keys[0] || 'l')[0], msg;
+    if (info && info.heard && info.swapped.length) {
+      const k = info.swapped[0];
+      letter = k[0];
+      const syl = (it.w.split(' ').find(s => tokens(s)[0] === k) || k).replace(/[,.!?]/g, '');
+      msg = `Thỏ nghe thành «<b>${esc(info.heard)}</b>» 🙉 – «<b>${wordHTML(syl)}</b>» đọc bằng chữ ` +
+        `<span class="${letter === 'l' ? 'L' : 'N'}">${letter.toUpperCase()}</span> nhé!<br>${TIP[letter]}`;
+    } else if (info && info.heard) {
+      msg = `Thỏ nghe là «<b>${esc(info.heard)}</b>». Bé ${it.long ? 'đọc' : 'nói'} to và rõ hơn chút nữa nhé! 💪`;
+    } else {
+      msg = `Mình thử lại nhé! ${TIP[letter]}`;
+    }
+    if (r.attempts >= 2) msg += '<br>Không sao đâu, Thỏ vẫn đứng chờ bé. Chưa được thì bấm <b>🕒 Để lát nữa</b>.';
     bubble(msg);
     flashTip(letter);
-    if (r.attempts >= 3) ui.btnSkip.classList.add('pulse');
+    if (r.attempts >= 2) ui.btnLater.classList.add('pulse');
+    if (r.attempts === 2 && TTS.voice) setTimeout(() => { if (canAnswer()) hear(); }, 900);
   }
 
-  function skip() {
+  // Bé chưa đọc được: thỏ không nhảy, cà rốt chui xuống đất, lát nữa quay lại
+  function later() {
     if (!canAnswer()) return;
-    G.carrot.passed = true;
-    G.results[G.idx].skipped = true;
-    toast('Củ sau nhé! 🥕', 'soft');
-    bubble('Không sao đâu! Mình thử củ cà rốt tiếp theo nhé 🥕');
-    ui.btnSkip.classList.remove('pulse');
-    G.jumpAt = T + 0.3;
+    const c = G.carrot, r = G.results[G.cur];
+    r.later++;
+    if (r.later === 1) {
+      r.state = 'later';
+      G.queue.push(G.cur);
+      bubble(`Cà rốt ${sayHTML(c.item)} chui xuống đất trốn rồi 🥕 Lát nữa nó sẽ quay lại để bé thử tiếp nhé!`);
+    } else {
+      r.state = 'skip';
+      bubble(`Mình để ${sayHTML(c.item)} cho lần chơi sau nhé. Bé đã cố gắng lắm rồi! 💖`);
+    }
+    c.hiding = true; c.hideT = 0;
+    G.motion = 'wait';
+    resetHeard();
+    hideCard();
+    toast('Để lát nữa nhé! 🕒', 'soft');
+    SFX.dig();
+    dirt(bunnyX + c.d * S);
+    ui.btnLater.classList.remove('pulse');
+    ui.btnRight.classList.remove('pulse');
+    updateTrack();
   }
 
   function hear() {
@@ -865,18 +1069,14 @@
     const c = G.carrot;
     G.carrot = null;
     if (c) G.old.push(c);
-    if (c && c.item && c.round === G.round && G.phase === 'play') {
-      G.idx++;
-      updateTrack();
-      if (G.idx >= G.items.length) finish();
-    } else if (G.phase === 'menu') {
-      G.nextDemo = T + 0.6 + Math.random() * 1.4;
-    }
+    if (c && c.item && c.round === G.round && G.phase === 'play') updateTrack();
+    else if (G.phase === 'menu') G.nextDemo = T + 0.6 + Math.random() * 1.4;
   }
 
   function finish() {
     G.phase = 'finish';
     Mic.stop();
+    resetHeard();
     setPill('off');
     hideCard();
     updateTrack();
@@ -886,18 +1086,20 @@
   }
 
   function showEnd() {
-    const total = G.items.length;
-    const first = G.results.filter(r => r.first).length;
+    const total = G.items.length, unit = LEVELS[G.level].unit;
+    const done = G.results.filter(r => r.state === 'done').length;
+    const first = G.results.filter(r => r.state === 'done' && r.attempts === 0 && r.later === 0).length;
     const ratio = total ? first / total : 0;
     const stars = ratio >= 0.8 ? 3 : ratio >= 0.5 ? 2 : 1;
     [...$('endStars').children].forEach((el, i) => el.classList.toggle('off', i >= stars));
     $('endTitle').textContent = stars === 3 ? 'Bé giỏi quá! 🎉' : stars === 2 ? 'Bé làm tốt lắm! 👏' : 'Bé đã rất cố gắng! 💪';
-    $('endText').textContent = `Thỏ con đã nhảy qua ${total} củ cà rốt. Bé đọc đúng ngay lần đầu ${first}/${total} từ.`;
-    const need = G.items.map((it, i) => ({ it, r: G.results[i] })).filter(x => x.r.attempts > 0 || x.r.skipped);
-    $('practiceTitle').textContent = need.length ? 'Từ bé nên luyện thêm:' : 'Không có từ nào cần luyện thêm. Tuyệt vời! 🌈';
+    $('endText').textContent = `Thỏ con đã nhảy qua ${done}/${total} củ cà rốt. Bé đọc đúng ngay lần đầu ${first}/${total} ${unit}.`;
+    const need = G.items.map((it, i) => ({ it, r: G.results[i] })).filter(x => x.r.attempts > 0 || x.r.later > 0);
+    $('practiceTitle').textContent = need.length ? `Những ${unit} bé nên luyện thêm:` : `Không có ${unit} nào cần luyện thêm. Tuyệt vời! 🌈`;
     $('practiceList').innerHTML = need.map(({ it, r }) => {
       const heard = r.heard.length ? ` <small>(Thỏ nghe: ${esc(r.heard[r.heard.length - 1])})</small>` : '';
-      return `<span class="chip">${it.e} ${wordHTML(it.w)}${heard}</span>`;
+      const pic = it.e ? `<span class="chip-pic">${picHTML(it)}</span>` : '';
+      return `<span class="chip">${pic}<span>${wordHTML(it.w)}${heard}</span></span>`;
     }).join('');
     showPanel('end');
   }
@@ -914,7 +1116,12 @@
       v = 0;
     } else if (G.motion === 'wait') {
       v = 0;
-      if (c && c.passed && T >= G.jumpAt) { startJump(); v = (2 * DJ) / JT; }
+      if (c && c.hiding) {
+        c.hideT += dt;
+        if (c.hideT >= HIDE_T) { G.carrot = null; G.motion = 'run'; }
+      } else if (c && c.passed && T >= G.jumpAt) {
+        startJump(); v = (2 * DJ) / JT;
+      }
     } else if (!c) {
       v = vRun;
     } else if (c.passed) {
@@ -937,7 +1144,7 @@
     if (G.motion === 'run' && v > 0) B.runPhase += dt * (5 + v * 2.4);
 
     if (!G.carrot && G.motion !== 'jump') {
-      if (G.phase === 'play' && G.idx < G.items.length) spawnCarrot();
+      if (G.phase === 'play') { if (G.queue.length) spawnCarrot(); else finish(); }
       else if (G.phase === 'menu' && T >= G.nextDemo) G.carrot = { d: (W - bunnyX) / S + 0.7, item: null, passed: true, round: -1 };
     }
 
@@ -985,7 +1192,7 @@
 
   function ell(x, y, rx, ry, rot, fill, stroke, lw) {
     ctx.beginPath();
-    ctx.ellipse(x, y, Math.max(rx, 0.01), Math.max(ry, 0.01), rot || 0, 0, Math.PI * 2);
+    ctx.ellipse(x, y, Math.max(rx, 0.01), Math.max(ry, 0.01), rot || 0, 0, TAU);
     if (fill) { ctx.fillStyle = fill; ctx.fill(); }
     if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw; ctx.stroke(); }
   }
@@ -1033,8 +1240,8 @@
       const k = cl.k * S / 100;
       ctx.save(); ctx.translate(cl.x, cl.y); ctx.scale(k, k);
       ctx.fillStyle = 'rgba(255,255,255,.95)';
-      [[0, 0, 24], [28, -16, 28], [58, -4, 24], [80, 6, 16]].forEach(([x, y, r]) => { ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill(); });
-      ctx.beginPath(); ctx.ellipse(40, 10, 50, 14, 0, 0, Math.PI * 2); ctx.fill();
+      [[0, 0, 24], [28, -16, 28], [58, -4, 24], [80, 6, 16]].forEach(([x, y, r]) => { ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); });
+      ctx.beginPath(); ctx.ellipse(40, 10, 50, 14, 0, 0, TAU); ctx.fill();
       ctx.restore();
     }
 
@@ -1071,7 +1278,7 @@
     ctx.fillRect(0, gb, W, S * 0.15);
     const gSp = S * 0.24, gOff = G.worldX % gSp;
     ctx.beginPath();
-    for (let x = -gOff - gSp; x < W + gSp; x += gSp) { ctx.moveTo(x + gSp / 2 + S * 0.13, gb); ctx.arc(x + gSp / 2, gb, S * 0.13, 0, Math.PI * 2); }
+    for (let x = -gOff - gSp; x < W + gSp; x += gSp) { ctx.moveTo(x + gSp / 2 + S * 0.13, gb); ctx.arc(x + gSp / 2, gb, S * 0.13, 0, TAU); }
     ctx.fill();
     ctx.fillStyle = '#ace6bf';
     ctx.fillRect(0, gb + S * 0.13, W, S * 0.03);
@@ -1088,7 +1295,7 @@
       const col = petals[Math.floor(hash(i + 8) * petals.length)];
       const pr = S * 0.035;
       for (let k = 0; k < 5; k++) {
-        const a = (k / 5) * Math.PI * 2 + T * 0.3;
+        const a = (k / 5) * TAU + T * 0.3;
         ell(x + Math.cos(a) * pr, y + Math.sin(a) * pr, pr, pr, 0, col);
       }
       ell(x, y, pr * 0.8, pr * 0.8, 0, '#fff4b8');
@@ -1098,11 +1305,14 @@
   function drawCarrot(c) {
     const x = bunnyX + c.d * S;
     if (x < -S || x > W + S) return;
-    const waiting = c === G.carrot && G.motion === 'wait' && !c.passed;
+    const waiting = c === G.carrot && G.motion === 'wait' && !c.passed && !c.hiding;
     const bounce = waiting ? Math.abs(Math.sin(T * 5)) * 0.06 : 0;
-    ell(x, groundY + 2, S * 0.26, S * 0.05, 0, 'rgba(160,110,150,.16)');
+    const sink = c.hiding ? clamp(c.hideT / HIDE_T, 0, 1) : 0;
+    const wob = c.hiding ? Math.sin(T * 40) * S * 0.03 * (1 - sink) : 0;
+    ell(x, groundY + 2, S * 0.26 * (1 - sink * 0.6), S * 0.05, 0, 'rgba(160,110,150,.16)');
     ctx.save();
-    ctx.translate(x, groundY);
+    if (c.hiding) { ctx.beginPath(); ctx.rect(0, 0, W, groundY + S * 0.05); ctx.clip(); }
+    ctx.translate(x + wob, groundY + sink * S * 1.05);
     ctx.scale((S / 100) * (1 - bounce * 0.5), (S / 100) * (1 + bounce));
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
@@ -1134,7 +1344,7 @@
     ell(-12, -55, 5, 3, -0.4, 'rgba(255,255,255,.5)');
 
     // Mặt cười
-    const happy = c.passed && c.item;
+    const happy = (c.passed && c.item) || c.hiding;
     ctx.strokeStyle = '#6b5570'; ctx.lineWidth = 2.6;
     if (happy) {
       ctx.beginPath(); ctx.arc(-8, -46, 3.5, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke();
@@ -1229,14 +1439,38 @@
     ctx.restore();
   }
 
+  // Bong bóng "…" cạnh thỏ khi thỏ đang dừng lại chờ bé
+  function drawWaitBubble() {
+    const c = G.carrot;
+    if (!(G.phase === 'play' && G.motion === 'wait' && c && c.item && !c.passed && !c.hiding)) return;
+    const x = bunnyX + S * 0.66, y = groundY - S * 1.6;
+    const w = S * 0.58, h = S * 0.34;
+    ell(x - w * 0.46, y + h * 0.72, S * 0.05, S * 0.05, 0, '#fff', '#f2cfe0', S * 0.02);
+    ell(x - w * 0.62, y + h * 1.05, S * 0.03, S * 0.03, 0, '#fff', '#f2cfe0', S * 0.015);
+    ell(x, y, w / 2, h / 2, 0, '#fff', '#f2cfe0', S * 0.025);
+    for (let i = 0; i < 3; i++) {
+      const a = 0.3 + 0.7 * Math.max(0, Math.sin(T * 4 - i * 0.8));
+      ell(x + (i - 1) * w * 0.25, y, S * 0.045, S * 0.045, 0, `rgba(240,106,158,${a.toFixed(2)})`);
+    }
+  }
+
   function burst(x, y, n) {
     const cols = ['#ffd86b', '#ff9cc2', '#8fd3ff', '#a8e6b8', '#c9b3ff'];
     for (let i = 0; i < n; i++) {
-      const a = Math.random() * Math.PI * 2, sp = S * (1.5 + Math.random() * 2.5);
+      const a = Math.random() * TAU, sp = S * (1.5 + Math.random() * 2.5);
       particles.push({
         x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - S * 1.5, g: S * 5,
         life: 1, decay: 0.8 + Math.random() * 0.5, size: S * (0.06 + Math.random() * 0.06),
         color: pick(cols), kind: Math.random() < 0.55 ? 'star' : 'heart', rot: Math.random() * 6, vr: (Math.random() - 0.5) * 6,
+      });
+    }
+  }
+  function dirt(x) {
+    for (let i = 0; i < 12; i++) {
+      particles.push({
+        x: x + (Math.random() - 0.5) * S * 0.4, y: groundY, vx: (Math.random() - 0.5) * S * 2.4, vy: -S * (1.2 + Math.random() * 1.8), g: S * 7,
+        life: 1, decay: 1.2 + Math.random() * 0.6, size: S * (0.03 + Math.random() * 0.03),
+        color: Math.random() < 0.5 ? '#efcfa6' : '#e4b98a', kind: 'dot', rot: 0, vr: 0,
       });
     }
   }
@@ -1260,6 +1494,7 @@
       const r = p.size;
       ctx.beginPath();
       if (p.kind === 'rect') ctx.rect(-r, -r * 0.5, r * 2, r);
+      else if (p.kind === 'dot') ctx.arc(0, 0, r, 0, TAU);
       else if (p.kind === 'heart') {
         ctx.moveTo(0, r * 0.9);
         ctx.bezierCurveTo(-r * 1.6, -r * 0.2, -r * 0.6, -r * 1.3, 0, -r * 0.4);
@@ -1267,7 +1502,7 @@
       } else {
         for (let k = 0; k < 10; k++) {
           const rr = k % 2 ? r * 0.45 : r;
-          const a = (k / 10) * Math.PI * 2 - Math.PI / 2;
+          const a = (k / 10) * TAU - Math.PI / 2;
           ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
         }
         ctx.closePath();
@@ -1283,6 +1518,7 @@
     for (const o of G.old) drawCarrot(o);
     if (G.carrot) drawCarrot(G.carrot);
     drawBunny();
+    drawWaitBubble();
     drawParticles();
   }
 
@@ -1295,16 +1531,27 @@
     requestAnimationFrame(frame);
   }
 
-  /* ---------- Chọn bài / chế độ ---------- */
+  /* ---------- Chọn cấp độ / chữ / người chấm ---------- */
   function setModeButtons() {
     document.querySelectorAll('#modeChoices .mode').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === G.mode)));
     if (!SR) ui.modeNote.textContent = 'Trình duyệt này chưa nghe được giọng nói. Mở bằng Chrome hoặc Safari để dùng micro, hoặc chọn «Bố mẹ / cô chấm».';
     else if (G.mode === 'mic') ui.modeNote.textContent = 'Thỏ cần micro và mạng Internet để nghe bé. Khi trình duyệt hỏi, hãy bấm «Cho phép» nhé.';
     else ui.modeNote.textContent = 'Bé đọc to từ trên bảng, bố mẹ nghe bé nói đúng thì bấm ✓ (hoặc phím cách).';
   }
-  document.querySelectorAll('#setChoices .choice').forEach(btn => btn.addEventListener('click', () => {
-    G.set = btn.dataset.set;
-    document.querySelectorAll('#setChoices .choice').forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
+  function setLevelButtons() {
+    document.querySelectorAll('#levelChoices .level').forEach(b => b.setAttribute('aria-pressed', String(Number(b.dataset.level) === G.level)));
+    const l3 = G.level === 3;
+    document.querySelectorAll('#letterRow .lt').forEach(b => { b.hidden = l3; b.setAttribute('aria-pressed', String(b.dataset.letter === G.letter)); });
+    $('letterNote').hidden = !l3;
+  }
+  document.querySelectorAll('#levelChoices .level').forEach(btn => btn.addEventListener('click', () => {
+    G.level = Number(btn.dataset.level);
+    setLevelButtons();
+    audio(); SFX.pop();
+  }));
+  document.querySelectorAll('#letterRow .lt').forEach(btn => btn.addEventListener('click', () => {
+    G.letter = btn.dataset.letter;
+    setLevelButtons();
     audio(); SFX.pop();
   }));
   document.querySelectorAll('#modeChoices .mode').forEach(btn => {
@@ -1316,6 +1563,7 @@
       audio(); SFX.pop();
     });
   });
+  setLevelButtons();
   setModeButtons();
 
   $('btnStart').addEventListener('click', startGame);
@@ -1324,7 +1572,7 @@
   $('btnHome').addEventListener('click', goMenu);
   ui.btnRight.addEventListener('click', correct);
   ui.btnWrong.addEventListener('click', () => wrong(null));
-  ui.btnSkip.addEventListener('click', skip);
+  ui.btnLater.addEventListener('click', later);
   ui.btnHear.addEventListener('click', hear);
   ui.btnMute.addEventListener('click', () => {
     muted = !muted;
@@ -1352,7 +1600,10 @@
   requestAnimationFrame(frame);
 
   // Dùng để kiểm thử nhanh trong console
-  window.__thoGame = { judge: (alts, w) => judge(alts, { keys: keysOf(w) }), keysOf, G };
+  window.__thoGame = {
+    judge: (alts, w, long) => judge(alts, { keys: keysOf(w), long: !!long }),
+    keysOf, G, LEVELS,
+  };
 })();
 </script>
 </body>
